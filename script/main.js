@@ -610,14 +610,39 @@ const updateSheetRange = (worksheet) => {
  * recognized.
  */
 const compareMatrixHeadersToGrid = (matrix, data) => {
-  const expectedSecondRow = getFlatHeaders(data)[1];
-  const actualFirstRow = matrix[0];
-  const actualSecondRow = matrix[1];
-  if (JSON.stringify(expectedSecondRow) === JSON.stringify(actualFirstRow))
-    return 1;
-  if (JSON.stringify(expectedSecondRow) === JSON.stringify(actualSecondRow))
-    return 2;
-  return false;
+  let headerRow = 0;
+  const columnHeaders = getFlatHeaders(data)[1];
+  const fileFirstRow = matrix[0];
+  const fileSecondRow = matrix[1];
+  if (headersAreEqual(columnHeaders, fileFirstRow)) {
+    headerRow = 1;
+  } else if (headersAreEqual(columnHeaders, fileSecondRow)) {
+    headerRow = 2;
+  }
+  return headerRow
+};
+
+/**
+ * Determine if an array of Strings that represent the header, are equal
+ * to a given array of Strings. This check removes all whitespace, and lowers
+ * the String before performing the equality check.
+ * @param {Array<String>} headerArrOne
+ * @param {Array<String>} headerArrTwo
+ * @return {Boolean} Returns True if both arrays have equal values, False if not.
+ */
+const headersAreEqual = (headerArrOne, headerArrTwo) => {
+  const headerOneTrimmed = headerArrOne.map((str) =>
+    str.toLowerCase().replace(/\s/g, "")
+  );
+  const headerTwoTrimmed = headerArrTwo.map((str) =>
+    str.toLowerCase().replace(/\s/g, "")
+  );
+  return (
+    Array.isArray(headerOneTrimmed) &&
+    Array.isArray(headerTwoTrimmed) &&
+    headerOneTrimmed.length === headerTwoTrimmed.length &&
+    headerOneTrimmed.every((val, index) => val === headerTwoTrimmed[index])
+  );
 };
 
 /**
